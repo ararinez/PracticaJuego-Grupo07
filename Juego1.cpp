@@ -846,12 +846,193 @@ public:
         } while (playAnotherHand(Play));
     }
 };
+
+class memoria
+{
+
+public:
+    void imp(char matriz[][100], int f) // imprime la matriz
+    {
+        for (int i = 0; i < f; i++)
+        {
+            for (int j = 0; j < f; j++)
+            {
+
+                cout << "\t" << matriz[i][j];
+            }
+            cout << endl;
+        }
+    }
+
+    void genera(char matriz[][100], int f)
+    {                         // se encarga de generar los valores aleatorios de la matriz en un vector
+                              // de tamaño 8 y ordenando estos valores para que se repitan 2 veces
+        int nE = (f * f) / 2; // esto seria n^2/2
+        int nA[30], nC[30];
+
+        while (nE)
+        {
+            nA[nE - 1] = (rand() % 25) + 65; // rango de las letras mayùsculas
+            nC[nE - 1] = char(nA[nE - 1]);   // usando el ASSCI se cambia de nùmeros a letras.
+            nE--;
+        }
+
+        cout << endl;
+        int k = 0, cont;
+
+        for (int i = 0; i < f; i++)
+        {
+
+            for (int j = 0; j < f; j++)
+            {
+
+                matriz[i][j] = nC[k];
+                cont++;
+                if (cont % 2 == 0)
+                { // estos permite que se retan los valores 2 veces
+                    k++;
+                }
+            }
+        }
+    }
+    // intercambio de forma aleatoria los elementos
+    void permuta(char matriz[][100], int f)
+    {
+        int teI, teJ, temp;
+        for (int i = 0; i < f; i++)
+        {
+            for (int j = 0; j < f; j++)
+            {
+                teI = rand() % f;
+                teJ = rand() % f;
+                temp = matriz[i][j];
+                matriz[i][j] = matriz[teI][teJ];
+                matriz[teI][teJ] = temp;
+            }
+        }
+    }
+};
+
+class Juego4
+{
+public:
+    void iniciar()
+    {
+        int n = 4, cons = 0, p = 0;
+        char matriz[100][100], nn;
+        int primerE, segundoE, f1, c1, f2, c2, cont = 0, fil[100], col[100], fil1[100], col1[100];
+        // Inicializo la semilla
+        srand((unsigned)time(NULL));
+
+        memoria m;
+
+        m.genera(matriz, n);
+        cout << "[------ Matriz ------]" << endl;
+        m.permuta(matriz, n);
+        m.imp(matriz, n);
+        cout << "[--------------------]" << endl;
+        cin.get();
+        // system("pause");
+        //printf("\033[2J\033[1;1H");
+
+        while (1)
+        {
+            do
+            { // bloque de instrucciones
+                cout << "Ingresa ubicacion del primer elemento (x y): ";
+                cin >> f1 >> c1;
+                primerE = matriz[f1][c1];
+                cout << "Ingresa ubicacion del segundo elemento (x y): ";
+                cin >> f2 >> c2;
+                segundoE = matriz[f2][c2];
+                cons++;
+                fil[p] = f1;
+                fil1[p] = f2;
+                col[p] = c1;
+                col1[p] = c2;
+
+            }
+
+            while (f1 == f2 & c1 == c2                     // indican la misma posiciòn
+                   || f1 >= n || c1 >= n                   // valor mayor al tamaño de la matriz
+                   || f2 >= n || c2 >= n || primerE == '-' // Un valor en la matriz la fue quitado
+                   || segundoE == '-');                    // condiciones de finalizaciòn
+
+            if (primerE == segundoE)
+            { // Si los valores en las posisciones indicadas son iguales se
+              // sustituyen por un guiòn
+                cout << endl
+                     << "Los elementos son iguales, se retiran de la matriz!" << endl;
+
+                matriz[f1][c1] = '-';
+                matriz[f2][c2] = '-';
+                cont += 2;
+                if (cons == 2)
+                {
+                    cout << endl
+                         << "Salir = s -- Continuar = c" << endl;
+                    cin >> nn;
+                    if (nn == 's')
+                    {
+                        break;
+                    }
+                }
+                cons = 0;
+            }
+            else
+            {
+                cout << endl
+                     << "Los elementos son DISTINTOS, sigue intentado!" << endl;
+
+                if (cons == 3)
+                {
+                    cout << "Necesita ayuda ? SI = s -- No = n: " << endl;
+                    cin >> nn;
+                    if (nn == 's')
+                    {
+                        cout << "[------ Matriz ------]" << endl;
+                        m.imp(matriz, n);
+                        cin.get();
+                        cout << "[--------------------]" << endl;
+                        cin.get();
+                        printf("\033[2J\033[1;1H");
+                    }
+                }
+
+                if (cons == 2)
+                {
+                    cout << endl
+                         << "Salir = s -- Continuar = c" << endl;
+                    cin >> nn;
+                    if (nn == 's')
+                    {
+                        break;
+                    }
+                }
+                cout << "[------ Matriz ------]" << endl;
+                m.imp(matriz, n);
+                cin.get();
+                cout << "[--------------------]" << endl;
+                cin.get();
+                printf("\033[2J\033[1;1H");
+            }
+
+            p++;
+            if (cont == (n * n)) // cont es igual al tamaño de la matriz
+            {
+                cout << "Se termino el juego!!" << endl;
+                break;
+            }
+        }
+    }
+};
 void menu()
 {
     int opcion = -1;
     Juego1 play1;
     Juego2 play2;
     Juego3 play3;
+    Juego4 play4;
     while (opcion != 0)
     {
 
@@ -859,6 +1040,7 @@ void menu()
         cout << "1. Piedra papel o tijera\n";
         cout << "2. Mastermind\n";
         cout << "3. BlackJack\n";
+        cout << "4. Memoria\n";
         cout << "0. Salir\n";
         cin >> opcion;
         switch (opcion)
@@ -874,6 +1056,9 @@ void menu()
             play3.instrucciones();
             play3.dificultad();
             play3.iniciar();
+            break;
+        case 4:
+            play4.iniciar();
             break;
         case 0:
             exit(0);
